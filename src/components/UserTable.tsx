@@ -1,38 +1,32 @@
 import { useEffect, useState } from "react";
-import { styled } from "@mui/material/styles";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell, { tableCellClasses } from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import { JP_User } from "../types";
 import getAllUsers from "../api";
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
+import { DataGrid } from "@mui/x-data-grid";
+import { GridValueGetterParams } from "@mui/x-data-grid";
 
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.common.black,
-    color: theme.palette.common.white,
+const columns = [
+  { field: "id", headerName: "ID", width: 200 },
+  { field: "name", headerName: "Name", width: 200 },
+  { field: "username", headerName: "Username", width: 200 },
+  { field: "email", headerName: "E-mail", width: 300 },
+  { field: "phone", headerName: "Phone No.", width: 200 },
+  {
+    field: "address.city",
+    headerName: "Location",
+    valueGetter: (params: GridValueGetterParams) => params.row.address.city,
+    width: 200,
   },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
+  {
+    field: "company.name",
+    headerName: "Company",
+    valueGetter: (params: GridValueGetterParams) => params.row.company.name,
+    width: 200,
   },
-}));
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  "&:nth-of-type(odd)": {
-    backgroundColor: theme.palette.action.hover,
-  },
-  // hide last border
-  "&:last-child td, &:last-child th": {
-    border: 0,
-  },
-}));
+];
 
 export default function CustomizedTables() {
   const [users, setUsers] = useState<JP_User[]>();
@@ -54,7 +48,15 @@ export default function CustomizedTables() {
   return (
     <>
       {loading && (
-        <Box sx={{ display: "flex" }}>
+        <Box
+          sx={{
+            display: "flex",
+            height: 400,
+            width: "100%",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
           <CircularProgress />
         </Box>
       )}
@@ -67,38 +69,18 @@ export default function CustomizedTables() {
       )}
 
       {!loading && !error && users && (
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 700 }} aria-label="customized table">
-            <TableHead>
-              <TableRow>
-                <StyledTableCell>ID</StyledTableCell>
-                <StyledTableCell align="right">Name</StyledTableCell>
-                <StyledTableCell align="right">E-mail</StyledTableCell>
-                <StyledTableCell align="right">Phone No.</StyledTableCell>
-                <StyledTableCell align="right">Location</StyledTableCell>
-                <StyledTableCell align="right">Company</StyledTableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {users.map((user, i) => (
-                <StyledTableRow key={i}>
-                  <StyledTableCell component="th" scope="row">
-                    {user.id}
-                  </StyledTableCell>
-                  <StyledTableCell align="right">{user.name}</StyledTableCell>
-                  <StyledTableCell align="right">{user.email}</StyledTableCell>
-                  <StyledTableCell align="right">{user.phone}</StyledTableCell>
-                  <StyledTableCell align="right">
-                    {user.address.street}, {user.address.city}
-                  </StyledTableCell>
-                  <StyledTableCell align="right">
-                    {user.company.name}
-                  </StyledTableCell>
-                </StyledTableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <div style={{ height: 400, width: "100%" }}>
+          <DataGrid
+            rows={users}
+            columns={columns}
+            initialState={{
+              pagination: {
+                paginationModel: { page: 0, pageSize: 5 },
+              },
+            }}
+            pageSizeOptions={[5, 10]}
+          />
+        </div>
       )}
     </>
   );
