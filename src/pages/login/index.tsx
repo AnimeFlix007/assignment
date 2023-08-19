@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { TextField, Button } from "@mui/material";
 import { useFormik } from "formik";
 import { User } from "../../types";
